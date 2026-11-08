@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>To Be — финальное закрепление ✨</title>
+<style>
+  :root{
+    --ink:#1E2A45;
+    --ink-soft:#44537A;
+    --line:#E9E1D7;
+    --mint:#CFE9DC;
+    --mint-d:#7CBF9C;
+    --lav:#E4DBF5;
+    --lav-d:#A992D8;
+    --peach:#FBE1CF;
+    --sky:#D8E8F7;
+    --rose:#F9D8DF;
+    --rose-d:#E09AA8;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    padding:26px 14px 70px;
+    background:#F7F3ED;
+    color:var(--ink);
+    font-family:"Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+    line-height:1.55;
+  }
+  .wrap{max-width:920px;margin:0 auto}
+  h1{font-size:clamp(22px,4vw,30px);margin:0 0 8px;color:#16233D}
+  .sub{margin:0 0 26px;color:#41506F;font-size:15px}
+
+  section{
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:20px 20px 22px;
+    margin-bottom:24px;
+    box-shadow:0 8px 22px rgba(30,42,69,.06);
+  }
+  section h2{
+    display:flex;align-items:center;gap:10px;
+    font-size:19px;margin:0 0 6px;color:#16233D;
+  }
+  .badge{
+    flex:0 0 auto;width:30px;height:30px;border-radius:50%;
+    display:inline-flex;align-items:center;justify-content:center;
+    font-size:15px;font-weight:700;color:#2A2350;background:var(--lav);
+  }
+  section:nth-of-type(2n) .badge{background:var(--mint)}
+  section:nth-of-type(3n) .badge{background:var(--peach)}
+  section:nth-of-type(5n) .badge{background:var(--sky)}
+  .hint{margin:0 0 16px;font-size:14px;color:#4B5A7A}
+
+  /* --- MCQ --- */
+  .qrow{
+    padding:12px 14px;border-radius:14px;background:#FBF8F3;
+    border:1px solid #EEE7DD;margin-bottom:10px;
+  }
+  .qrow.done{background:#EFF8F2;border-color:#BFE3CE}
+  .qtext{margin-bottom:8px;font-size:16px}
+  .blank{
+    display:inline-block;min-width:54px;text-align:center;
+    border-bottom:2px solid #B9C5DB;color:#8A93A8;font-weight:700;
+  }
+  .blank.filled{border-bottom-color:var(--mint-d);color:#1F7A4D}
+  .opts{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{
+    font:inherit;font-size:15px;cursor:pointer;
+    padding:7px 16px;border-radius:11px;
+    border:2px solid #CFD9EA;background:#EEF3FB;color:var(--ink);
+    transition:transform .12s,background .12s,border-color .12s;
+  }
+  .opt:hover:not(:disabled){background:#E1EBFA;transform:translateY(-1px)}
+  .opt:disabled{cursor:default;opacity:.65}
+  .opt.correct{background:#CDEBDA;border-color:var(--mint-d);opacity:1;font-weight:600}
+  .opt.wrong{background:var(--rose);border-color:var(--rose-d);animation:shake .3s}
+  @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .score{margin-top:12px;font-size:14px;font-weight:600;color:var(--ink-soft)}
+  .score.win{color:#1F7A4D}
+
+  /* --- Matching --- */
+  .match{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  @media(max-width:560px){.match{grid-template-columns:1fr}}
+  .mcol{display:flex;flex-direction:column;gap:8px}
+  .mcol h4{margin:0 0 2px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:#69769A}
+  .mitem{
+    font:inherit;font-size:16px;text-align:left;cursor:pointer;
+    padding:10px 14px;border-radius:12px;
+    border:2px solid #D9E2F0;background:#F5F8FD;color:var(--ink);
+    transition:.15s;
+  }
+  .mitem:hover:not(:disabled){background:#E9F1FB;transform:translateY(-1px)}
+  .mitem.sel{background:var(--lav);border-color:var(--lav-d)}
+  .mitem.done{background:#CDEBDA;border-color:var(--mint-d);cursor:default;opacity:.85}
+  .mitem.bad{background:var(--rose);border-color:var(--rose-d);animation:shake .3s}
+
+  /* --- Listening --- */
+  .lrow{
+    display:flex;flex-wrap:wrap;align-items:center;gap:8px;
+    padding:12px;border-radius:14px;background:#FBF8F3;
+    border:1px solid #EEE7DD;margin-bottom:10px;
+  }
+  .lnum{
+    width:26px;height:26px;border-radius:50%;background:var(--peach);
+    color:#5C3A22;font-weight:700;font-size:14px;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .lrow input{
+    flex:1 1 220px;min-width:170px;font:inherit;font-size:15px;
+    padding:9px 12px;border-radius:11px;border:2px solid #CFD9EA;
+    background:#fff;color:var(--ink);
+  }
+  .lrow input:focus{outline:none;border-color:var(--lav-d);box-shadow:0 0 0 3px rgba(169,146,216,.25)}
+  .lrow input.ok{border-color:var(--mint-d);background:#EFF8F2}
+  .lrow input.bad{border-color:var(--rose-d);background:#FDF0F3;animation:shake .3s}
+  .lmsg{flex:0 0 100%;font-size:14px;font-weight:600;color:var(--ink-soft);padding-left:34px}
+  .lmsg.ok{color:#1F7A4D}
+  .lmsg.bad{color:#A63A52}
+
+  /* --- Buttons --- */
+  .btn{
+    font:inherit;font-size:15px;cursor:pointer;
+    padding:8px 14px;border-radius:11px;
+    border:2px solid #CFD9EA;background:#EEF3FB;color:var(--ink);
+    transition:.12s;
+  }
+  .btn:hover{background:#E1EBFA;transform:translateY(-1px)}
+  .btn.play{background:var(--lav);border-color:#B9A6E3}
+  .btn.play:hover{background:#D9CCF2}
+  .btn.small{font-size:14px;padding:6px 12px}
+  .btn.ghost{background:#fff}
+  .btn.big{font-size:16px;padding:10px 18px;background:var(--mint);border-color:var(--mint-d)}
+  .btn.big:hover{background:#BFE3CE}
+
+  /* --- Reading --- */
+  .texts{display:grid;gap:14px;margin-bottom:20px}
+  @media(min-width:800px){.texts{grid-template-columns:repeat(3,1fr)}}
+  .tcard{background:#FBF8F3;border:1px solid #EEE7DD;border-radius:14px;padding:14px 16px}
+  .tcard h3{margin:0 0 8px;font-size:16px;color:#16233D}
+  .tcard p{margin:0;font-size:15px}
+  .subh{font-size:15px;font-weight:700;color:#16233D;margin:18px 0 10px}
+
+  /* --- Speaking --- */
+  .scards{display:grid;gap:10px;margin-bottom:18px}
+  @media(min-width:720px){.scards{grid-template-columns:1fr 1fr}}
+  .scard{
+    background:#FBF8F3;border:1px solid #EEE7DD;border-radius:14px;
+    padding:12px 14px;cursor:pointer;transition:.15s;
+  }
+  .scard:hover{background:#F5F0E9}
+  .scard .sq{font-size:16px;font-weight:600}
+  .scard .shint{
+    display:none;margin-top:8px;font-size:14px;color:#2E5442;
+    background:#E9F5EE;border-radius:10px;padding:8px 10px;
+  }
+  .scard.open .shint{display:block}
+  .scard.done{background:#EFF8F2;border-color:#BFE3CE}
+  .sdone{
+    margin-top:10px;font:inherit;font-size:13px;cursor:pointer;
+    padding:5px 12px;border-radius:9px;border:2px solid #CFD9EA;
+    background:#fff;color:var(--ink);
+  }
+  .scard.done .sdone{background:var(--mint-d);border-color:var(--mint-d);color:#0F3A24;font-weight:700}
+  .rnd{
+    display:flex;flex-wrap:wrap;gap:10px;align-items:center;
+    background:#F3EFFB;border:2px dashed #B9A6E3;border-radius:14px;
+    padding:14px;margin-bottom:18px;
+  }
+  .rndq{font-size:17px;font-weight:600;flex:1 1 240px;color:#2A2350}
+
+  /* --- Word order --- */
+  .wobox{background:#FBF8F3;border:1px solid #EEE7DD;border-radius:14px;padding:14px;margin-bottom:12px}
+  .wolabel{font-size:13px;font-weight:700;color:#69769A;margin-bottom:8px}
+  .wo-answer{
+    min-height:52px;border:2px dashed #CFD9EA;border-radius:12px;background:#fff;
+    padding:8px;display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;
+  }
+  .wo-answer.ok{border-color:var(--mint-d);border-style:solid;background:#EFF8F2}
+  .wo-pool{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+  .chip{
+    font:inherit;font-size:15px;cursor:pointer;
+    padding:7px 14px;border-radius:10px;border:2px solid #CFD9EA;
+    background:#EEF3FB;color:var(--ink);transition:.12s;
+  }
+  .chip:hover{background:#E1EBFA;transform:translateY(-1px)}
+  .woctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .wores{font-size:14px;font-weight:600}
+  .wores.ok{color:#1F7A4D}
+  .wores.bad{color:#A63A52}
+
+  /* --- Writing --- */
+  .factbox{
+    background:#E8F1FB;border:1px solid #C9DCEF;border-radius:14px;
+    padding:14px 16px;margin-bottom:14px;
+  }
+  .factbox h3{margin:0 0 8px;font-size:16px;color:#16233D}
+  .facts{display:flex;flex-wrap:wrap;gap:8px}
+  .fact{
+    font-size:14px;padding:6px 13px;border-radius:20px;
+    background:#fff;border:2px solid #C9DCEF;color:#22385C;font-weight:600;
+  }
+  .wr-area{
+    width:100%;min-height:130px;font:inherit;font-size:16px;
+    padding:12px 14px;border-radius:14px;border:2px solid #CFD9EA;
+    background:#fff;color:var(--ink);resize:vertical;line-height:1.5;
+  }
+  .wr-area:focus{outline:none;border-color:var(--lav-d);box-shadow:0 0 0 3px rgba(169,146,216,.25)}
+  .wr-facts{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+  .wr-fact{
+    font-size:14px;padding:5px 13px;border-radius:20px;
+    background:#EEF3FB;border:2px solid #D9E2F0;color:#4B5A7A;
+    transition:.15s;
+  }
+  .wr-fact.ok{background:#CDEBDA;border-color:var(--mint-d);color:#1F7A4D;font-weight:700}
+  .wr-model{
+    display:none;margin-top:14px;background:#F3EFFB;
+    border:2px dashed #B9A6E3;border-radius:14px;padding:14px;font-size:15px;
+  }
+  .wr-model.show{display:block}
+  .wr-model b{color:#2A2350}
+  .wrctrl{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+  .wrmsg{font-size:14px;font-weight:600;color:var(--ink-soft)}
+
+  .footer{text-align:center;font-size:14px;color:#69769A;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <h1>To Be — финальное закрепление ✨</h1>
+  <p class="sub">Привет! Сегодня повторяем <b>am / is / are</b>, национальности и профессии.
+  Нажимай на всё, что видишь — каждое задание интерактивное 💡</p>
+
+  <!-- 1 -->
+  <section>
+    <h2><span class="badge">1</span> Am / Is / Are — выбери форму</h2>
+    <p class="hint">Здесь есть утверждения (+), отрицания (−) и вопросы (?).
+    Нажми на правильную форму. Если ошиблась — кнопка станет красной, попробуй ещё раз.</p>
+    <div id="ex1"></div>
+  </section>
+
+  <!-- 2 -->
+  <section>
+    <h2><span class="badge">2</span> Страна → национальность</h2>
+    <p class="hint">Сначала нажми на страну, потом на её национальность. Правильная пара станет зелёной 🔗</p>
+    <div class="match">
+      <div class="mcol">
+        <h4>Страна</h4>
+        <div id="matchLeft" class="mcol"></div>
+      </div>
+      <div class="mcol">
+        <h4>Национальность</h4>
+        <div id="matchRight" class="mcol"></div>
+      </div>
+    </div>
+    <div class="score" id="matchScore"></div>
+  </section>
+
+  <!-- 3 -->
+  <section>
+    <h2><span class="badge">3</span> Национальности: выбери правильное слово</h2>
+    <p class="hint">Помни: страна и национальность — разные слова! Italy → Italian, Japan → Japanese, Switzerland → Swiss.</p>
+    <div id="ex3"></div>
+  </section>
+
+  <!-- 4 -->
+  <section>
+    <h2><span class="badge">4</span> Послушай и запиши 🔊</h2>
+    <p class="hint">Нажми <b>🔊 Слушать</b> и напиши предложение, которое услышала. Можно слушать сколько угодно раз.
+    Слова-подсказки: <i>am, is, are, from, She, He, They, I, We, Japan, Chinese, Brazil, a, teacher, Turkey</i>.</p>
+    <div id="listenBox"></div>
+    <div class="score" id="listenScore"></div>
+  </section>
+
+  <!-- 5 = бывшее 7 -->
+  <section>
+    <h2><span class="badge">5</span> Собери предложение 🧩</h2>
+    <p class="hint">Нажимай на слова, чтобы построить предложение. Одно слово — лишнее!
+    Нажми на слово в верхней строке, чтобы вернуть его назад.</p>
+    <div id="woBox"></div>
+  </section>
+
+  <!-- 6 = чтение -->
+  <section>
+    <h2><span class="badge">6</span> Чтение: три знаменитых человека 📖</h2>
+    <p class="hint">Прочитай тексты внимательно — вопросы проверяют детали. Все ответы есть внутри текстов.</p>
+
+    <div class="texts">
+      <div class="tcard">
+        <h3>Shakira (singer)</h3>
+        <p>Hi! My name is Shakira. I am Colombian and I am a singer. My music is famous all
+        over the world. I am not American, but I speak English and Spanish very well.
+        My family is in Colombia. My songs are happy and my concerts are always big. Bye!</p>
+      </div>
+      <div class="tcard">
+        <h3>Lionel Messi (football player)</h3>
+        <p>Good afternoon! My name is Lionel Messi. I am a football player. I am Argentinian
+        and my home is in Argentina. I am not a doctor — I am a sportsman!
+        My fans are happy when I play. My friends are football players too. See you!</p>
+      </div>
+      <div class="tcard">
+        <h3>Jackie Chan (actor)</h3>
+        <p>Good evening! I am Jackie Chan. I am an actor and I am Chinese.
+        My films are famous in many countries. I am not a singer, but my films are funny
+        and my fans are happy. My home is in China and my friends are actors too. Good night!</p>
+      </div>
+    </div>
+
+    <div class="subh">A. Выбери правильный ответ</div>
+    <div id="read1"></div>
+
+    <div class="subh">B. True или False?</div>
+    <div id="read2"></div>
+  </section>
+
+  <!-- 7 = speaking -->
+  <section>
+    <h2><span class="badge">7</span> Speaking — поговорим! 🗣️</h2>
+    <p class="hint">Нажми на карточку — появится подсказка. Отвечай вслух полными предложениями с <b>am / is / are</b>.
+    Когда сказала — нажми «✓ Сказала».</p>
+
+    <div class="rnd">
+      <div class="rndq" id="rndQ">Нажми на кнопку — получи случайный вопрос!</div>
+      <button class="btn big" id="rndBtn" type="button">🎲 Случайный вопрос</button>
+      <button class="btn play" id="rndSpeak" type="button" style="display:none">🔊 Послушать</button>
+    </div>
+
+    <div class="scards" id="speakBox"></div>
+    <div class="score" id="speakScore"></div>
+  </section>
+
+  <!-- 8 = writing -->
+  <section>
+    <h2><span class="badge">8</span> Writing — напиши о Джонни Деппе ✍️</h2>
+    <p class="hint">Это задание <b>не про тебя</b>! Напиши 4–6 предложений о Джонни Деппе.
+    Используй <b>is / is not</b>, национальность и профессию. Не забудь про возраст.</p>
+
+    <div class="factbox">
+      <h3>🎬 Факты для рассказа</h3>
+      <div class="facts">
+        <span class="fact">Имя: Johnny Depp</span>
+        <span class="fact">Возраст: 63</span>
+        <span class="fact">Страна: the USA</span>
+        <span class="fact">Национальность: American</span>
+        <span class="fact">Профессия: actor</span>
+        <span class="fact">Не певец (not a singer)</span>
+      </div>
+    </div>
+
+    <textarea class="wr-area" id="wrArea" placeholder="Johnny Depp is ..."></textarea>
+
+    <div class="wr-facts" id="wrFacts">
+      <span class="wr-fact" data-key="is">глагол is</span>
+      <span class="wr-fact" data-key="age">возраст 63</span>
+      <span class="wr-fact" data-key="job">профессия actor</span>
+      <span class="wr-fact" data-key="nat">национальность American</span>
+      <span class="wr-fact" data-key="country">страна the USA</span>
+    </div>
+
+    <div class="wrctrl">
+      <button class="btn small" id="wrCheck" type="button">Проверить</button>
+      <button class="btn small ghost" id="wrModelBtn" type="button">Пример ответа</button>
+      <span class="wrmsg" id="wrMsg"></span>
+    </div>
+
+    <div class="wr-model" id="wrModel">
+      <b>Model answer:</b><br>
+      Johnny Depp is an actor. He is 63 years old. He is from the USA. He is American.
+      He is not a singer. His films are very famous.
+    </div>
+  </section>
+
+  <p class="footer">Great job! You are a star ⭐ See you! 👋</p>
+</div>
+
+<script>
+/* ================== helpers ================== */
+function shuffle(arr){
+  const a = arr.slice();
+  for(let i=a.length-1;i>0;i--){
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+let englishVoice = null;
+function pickVoice(){
+  if(!('speechSynthesis' in window)) return;
+  const vs = window.speechSynthesis.getVoices() || [];
+  englishVoice = vs.find(v => /en[-_]US/i.test(v.lang))
+              || vs.find(v => /^en/i.test(v.lang))
+              || null;
+}
+if('speechSynthesis' in window){
+  pickVoice();
+  window.speechSynthesis.onvoiceschanged = pickVoice;
+}
+
+function speak(text){
+  if(!('speechSynthesis' in window)){
+    alert('Этот браузер не умеет озвучивать текст. Попроси учителя прочитать предложение вслух 🙂');
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = 'en-US';
+  u.rate = 0.85;
+  if(englishVoice) u.voice = englishVoice;
+  window.speechSynthesis.speak(u);
+}
+
+/* ============ generic multiple-choice renderer ============ */
+function renderMCQ(id, data){
+  const c = document.getElementById(id);
+
+  data.forEach(item => {
+    const row = document.createElement('div');
+    row.className = 'qrow';
+
+    const q = document.createElement('div');
+    q.className = 'qtext';
+    q.innerHTML = item.q;
+    row.appendChild(q);
+
+    const box = document.createElement('div');
+    box.className = 'opts';
+
+    item.opts.forEach(o => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.textContent = o;
+      b.addEventListener('click', () => {
+        if(row.classList.contains('done')) return;
+        if(o === item.ans){
+          b.classList.add('correct');
+          row.classList.add('done');
+          Array.from(box.children).forEach(x => x.disabled = true);
+          const blank = q.querySelector('.blank');
+          if(blank){ blank.textContent = o; blank.classList.add('filled'); }
+          updateScore(id, data.length);
+        } else {
+          b.classList.add('wrong');
+          setTimeout(() => b.classList.remove('wrong'), 800);
+        }
+      });
+      box.appendChild(b);
+    });
+
+    row.appendChild(box);
+    c.appendChild(row);
+  });
+
+  const s = document.createElement('div');
+  s.className = 'score';
+  s.id = id + '-score';
+  c.appendChild(s);
+  updateScore(id, data.length);
+}
+
+function updateScore(id, total){
+  const c = document.getElementById(id);
+  const done = c.querySelectorAll('.qrow.done').length;
+  const s = document.getElementById(id + '-score');
+  if(!s) return;
+  if(done === total){
+    s.textContent = 'Всё верно! Отлично 🎉';
+    s.classList.add('win');
+  } else {
+    s.textContent = 'Правильно: ' + done + ' / ' + total;
+    s.classList.remove('win');
+  }
+}
+
+/* ================== 1. am / is / are ================== */
+renderMCQ('ex1', [
+  {q:'I <b class="blank">___</b> a student.',                opts:['am','is','are'], ans:'am'},
+  {q:'He <b class="blank">___</b> from Brazil.',             opts:['am','is','are'], ans:'is'},
+  {q:'They <b class="blank">___</b> at home.',               opts:['am','is','are'], ans:'are'},
+  {q:'She <b class="blank">___</b> not Japanese.',           opts:['am','is','are'], ans:'is'},
+  {q:'<b class="blank">___</b> you a teacher?',              opts:['Am','Is','Are'], ans:'Are'},
+  {q:'We <b class="blank">___</b> from Argentina.',          opts:['am','is','are'], ans:'are'},
+  {q:'It <b class="blank">___</b> not a big city.',          opts:['am','is','are'], ans:'is'},
+  {q:'My friends <b class="blank">___</b> singers.',         opts:['am','is','are'], ans:'are'},
+  {q:'<b class="blank">___</b> he a doctor?',                opts:['Am','Is','Are'], ans:'Is'},
+  {q:'I <b class="blank">___</b> not American.',             opts:['am','is','are'], ans:'am'},
+  {q:'<b class="blank">___</b> they from Italy?',            opts:['Am','Is','Are'], ans:'Are'},
+  {q:'You <b class="blank">___</b> a good student.',         opts:['am','is','are'], ans:'are'}
+]);
+
+/* ================== 2. matching ================== */
+const matchPairs = [
+  ['China','Chinese'],
+  ['Japan','Japanese'],
+  ['France','French'],
+  ['Germany','German'],
+  ['Italy','Italian'],
+  ['Spain','Spanish'],
+  ['Brazil','Brazilian'],
+  ['Turkey','Turkish'],
+  ['Vietnam','Vietnamese'],
+  ['Switzerland','Swiss']
+];
+
+(function buildMatching(){
+  const left  = document.getElementById('matchLeft');
+  const right = document.getElementById('matchRight');
+  const map = {};
+  matchPairs.forEach(p => map[p[0]] = p[1]);
+
+  let selected = null;
+  let matched = 0;
+
+  const countries = shuffle(matchPairs.map(p => p[0]));
+  const nations   = shuffle(matchPairs.map(p => p[1]));
+
+  countries.forEach(country => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mitem';
+    b.dataset.key = country;
+    b.textContent = '📍 ' + country;
+    b.addEventListener('click', () => {
+      if(b.classList.contains('done')) return;
+      Array.from(left.children).forEach(x => x.classList.remove('sel'));
+      b.classList.add('sel');
+      selected = b;
+    });
+    left.appendChild(b);
+  });
+
+  nations.forEach(nation => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'mitem';
+    b.dataset.key = nation;
+    b.textContent = '🗣️ ' + nation;
+    b.addEventListener('click', () => {
+      if(b.classList.contains('done')) return;
+      if(!selected){
+        b.classList.add('bad');
+        setTimeout(() => b.classList.remove('bad'), 500);
+        return;
+      }
+      if(map[selected.dataset.key] === nation){
+        selected.classList.remove('sel');
+        selected.classList.add('done');
+        selected.disabled = true;
+        b.classList.add('done');
+        b.disabled = true;
+        selected = null;
+        matched++;
+        const sc = document.getElementById('matchScore');
+        if(matched === matchPairs.length){
+          sc.textContent = 'Все пары найдены! Супер 🎉';
+          sc.classList.add('win');
+        } else {
+          sc.textContent = 'Найдено пар: ' + matched + ' / ' + matchPairs.length;
+        }
+      } else {
+        const bad1 = selected;
+        bad1.classList.add('bad');
+        b.classList.add('bad');
+        setTimeout(() => {
+          bad1.classList.remove('bad','sel');
+          b.classList.remove('bad');
+        }, 550);
+        selected = null;
+      }
+    });
+    right.appendChild(b);
+  });
+
+  document.getElementById('matchScore').textContent = 'Найдено пар: 0 / ' + matchPairs.length;
+})();
+
+/* ================== 3. nationalities MCQ ================== */
+renderMCQ('ex3', [
+  {q:'Anna is from Italy. She is ...',        opts:['Italian','Italish','Italy'],        ans:'Italian'},
+  {q:'Kenji is from Japan. He is ...',        opts:['Japanese','Japan','Japanish'],      ans:'Japanese'},
+  {q:'Sven is Swiss. He is from ...',         opts:['Switzerland','Swissland','Sweden'], ans:'Switzerland'},
+  {q:'Maria is from Brazil. She is ...',      opts:['Brazilian','Brazil','Brasilian'],   ans:'Brazilian'},
+  {q:'Tom is from the USA. He is ...',        opts:['American','USA','Americanish'],     ans:'American'},
+  {q:'Olga is from Poland. She is ...',       opts:['Polish','Poland','Polandish'],      ans:'Polish'},
+  {q:'Ahmed is from Turkey. He is ...',       opts:['Turkish','Turkey','Turkian'],       ans:'Turkish'},
+  {q:'Mai is from Vietnam. She is ...',       opts:['Vietnamese','Vietnam','Vietnamish'],ans:'Vietnamese'}
+]);
+
+/* ================== 4. listening ================== */
+const listenData = [
+  'She is from Japan.',
+  'He is Chinese.',
+  'They are from Brazil.',
+  'I am a teacher.',
+  'We are from Turkey.'
+];
+
+const norm = s => s.toLowerCase()
+  .replace(/[.,!?'’"]/g,'')
+  .replace(/\s+/g,' ')
+  .trim();
+
+(function buildListening(){
+  const box = document.getElementById('listenBox');
+  let done = 0;
+
+  listenData.forEach((sent, i) => {
+    const row = document.createElement('div');
+    row.className = 'lrow';
+
+    const num = document.createElement('div');
+    num.className = 'lnum';
+    num.textContent = i + 1;
+
+    const play = document.createElement('button');
+    play.type = 'button';
+    play.className = 'btn play small';
+    play.textContent = '🔊 Слушать';
+    play.addEventListener('click', () => speak(sent));
+
+    const inp = document.createElement('input');
+    inp.type = 'text';
+    inp.placeholder = 'Напиши, что услышала...';
+
+    const chk = document.createElement('button');
+    chk.type = 'button';
+    chk.className = 'btn small';
+    chk.textContent = 'Проверить';
+
+    const rev = document.createElement('button');
+    rev.type = 'button';
+    rev.className = 'btn small ghost';
+    rev.textContent = 'Ответ';
+
+    const msg = document.createElement('div');
+    msg.className = 'lmsg';
+
+    chk.addEventListener('click', () => {
+      if(!inp.value.trim()){
+        msg.className = 'lmsg';
+        msg.textContent = 'Сначала напиши что-нибудь 🙂';
+        return;
+      }
+      if(norm(inp.value) === norm(sent)){
+        inp.classList.remove('bad');
+        inp.classList.add('ok');
+        msg.className = 'lmsg ok';
+        msg.textContent = 'Верно! ✅';
+        if(!row.dataset.ok){
+          row.dataset.ok = '1';
+          done++;
+          updateListenScore();
+        }
+      } else {
+        inp.classList.remove('ok');
+        inp.classList.add('bad');
+        msg.className = 'lmsg bad';
+        msg.textContent = 'Пока не так. Послушай ещё раз 🔁';
+        setTimeout(() => inp.classList.remove('bad'), 900);
+      }
+    });
+
+    inp.addEventListener('keydown', e => { if(e.key === 'Enter') chk.click(); });
+
+    rev.addEventListener('click', () => {
+      msg.className = 'lmsg';
+      msg.innerHTML = 'Правильно: <b>' + sent + '</b>';
+    });
+
+    row.append(num, play, inp, chk, rev, msg);
+    box.appendChild(row);
+  });
+
+  function updateListenScore(){
+    const s = document.getElementById('listenScore');
+    if(done === listenData.length){
+      s.textContent = 'Все предложения верно! Отличный слух 🎉';
+      s.classList.add('win');
+    } else {
+      s.textContent = 'Верно: ' + done + ' / ' + listenData.length;
+      s.classList.remove('win');
+    }
+  }
+  updateListenScore();
+})();
+
+/* ================== 5. word order ================== */
+const woData = [
+  {words:['She','is','from','Japan'],                    extra:['are']},
+  {words:['They','are','not','American'],                extra:['is']},
+  {words:['My','friend','is','a','taxi','driver'],       extra:['are']},
+  {words:['We','are','from','Switzerland'],              extra:['is']},
+  {words:['Are','you','from','Turkey'],                  extra:['am']}
+];
+
+(function buildWordOrder(){
+  const c = document.getElementById('woBox');
+
+  woData.forEach((item, idx) => {
+    const box = document.createElement('div');
+    box.className = 'wobox';
+
+    const label = document.createElement('div');
+    label.className = 'wolabel';
+    label.textContent = 'Предложение ' + (idx + 1);
+
+    const ans = document.createElement('div');
+    ans.className = 'wo-answer';
+
+    const pool = document.createElement('div');
+    pool.className = 'wo-pool';
+
+    const chips = shuffle(item.words.concat(item.extra));
+
+    const res = document.createElement('span');
+    res.className = 'wores';
+
+    chips.forEach(w => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip';
+      b.textContent = w;
+      b.addEventListener('click', () => {
+        if(b.parentElement === pool) ans.appendChild(b);
+        else pool.appendChild(b);
+        ans.classList.remove('ok');
+        res.textContent = '';
+        res.className = 'wores';
+      });
+      pool.appendChild(b);
+    });
+
+    const chk = document.createElement('button');
+    chk.type = 'button';
+    chk.className = 'btn small';
+    chk.textContent = 'Проверить';
+    chk.addEventListener('click', () => {
+      const got = Array.from(ans.children).map(x => x.textContent).join(' ');
+      const want = item.words.join(' ');
+      if(got === want){
+        res.textContent = 'Верно! ✅';
+        res.className = 'wores ok';
+        ans.classList.add('ok');
+      } else {
+        res.textContent = 'Попробуй ещё 🔁';
+        res.className = 'wores bad';
+        ans.classList.remove('ok');
+      }
+    });
+
+    const rst = document.createElement('button');
+    rst.type = 'button';
+    rst.className = 'btn small ghost';
+    rst.textContent = 'Сброс';
+    rst.addEventListener('click', () => {
+      Array.from(ans.children).forEach(x => pool.appendChild(x));
+      res.textContent = '';
+      res.className = 'wores';
+      ans.classList.remove('ok');
+    });
+
+    const ctrl = document.createElement('div');
+    ctrl.className = 'woctrl';
+    ctrl.append(chk, rst, res);
+
+    box.append(label, ans, pool, ctrl);
+    c.appendChild(box);
+  });
+})();
+
+/* ================== 6. reading ================== */
+renderMCQ('read1', [
+  {q:'What is Shakira’s job?',
+   opts:['a singer','a doctor','an actress'], ans:'a singer'},
+  {q:'Is Shakira American?',
+   opts:['Yes, she is.','No, she is not.','She is British.'], ans:'No, she is not.'},
+  {q:'Where is her family?',
+   opts:['in Colombia','in the USA','in Spain'], ans:'in Colombia'},
+  {q:'Messi is ...',
+   opts:['a football player','a doctor','a singer'], ans:'a football player'},
+  {q:'Where is Messi’s home?',
+   opts:['in Argentina','in Brazil','in Italy'], ans:'in Argentina'},
+  {q:'Jackie Chan is ...',
+   opts:['Chinese','Japanese','Vietnamese'], ans:'Chinese'},
+  {q:'What does Jackie Chan say about his films?',
+   opts:['They are funny.','They are not famous.','They are very long.'], ans:'They are funny.'}
+]);
+
+renderMCQ('read2', [
+  {q:'Shakira speaks English and Spanish.',          opts:['True','False'], ans:'True'},
+  {q:'Shakira’s concerts are small.',                opts:['True','False'], ans:'False'},
+  {q:'Messi is Argentinian.',                        opts:['True','False'], ans:'True'},
+  {q:'Messi is a doctor.',                           opts:['True','False'], ans:'False'},
+  {q:'Messi’s fans are happy when he plays.',        opts:['True','False'], ans:'True'},
+  {q:'Jackie Chan is a singer.',                     opts:['True','False'], ans:'False'},
+  {q:'Jackie Chan’s friends are actors too.',        opts:['True','False'], ans:'True'}
+]);
+
+/* ================== 7. speaking ================== */
+const speakQs = [
+  {q:'What is your name?',                            h:'My name is ... / I am ...'},
+  {q:'How are you?',                                  h:'I am fine, thank you. And you?'},
+  {q:'Where are you from?',                           h:'I am from Russia. I am from Moscow.'},
+  {q:'What is your nationality?',                     h:'I am Russian.'},
+  {q:'What is your job?',                             h:'I am a student. / I am a teacher.'},
+  {q:'Are you a student?',                            h:'Yes, I am. / No, I am not. I am ...'},
+  {q:'Is your friend American?',                      h:'No, he is not. He is Russian. / Yes, she is.'},
+  {q:'Who is your favourite singer? Is he American?', h:'My favourite singer is ... He is American. / She is British.'},
+  {q:'Is your teacher British?',                      h:'No, she is not. She is Russian.'},
+  {q:'Are your parents from Russia?',                 h:'Yes, they are. / No, they are not. They are from ...'},
+  {q:'Is your best friend a doctor?',                 h:'No, he is not. He is a student. / Yes, she is.'},
+  {q:'Are you from Spain?',                           h:'No, I am not. I am from Russia.'}
+];
+
+(function buildSpeaking(){
+  const box = document.getElementById('speakBox');
+
+  speakQs.forEach((item, i) => {
+    const card = document.createElement('div');
+    card.className = 'scard';
+
+    const q = document.createElement('div');
+    q.className = 'sq';
+    q.textContent = (i + 1) + '. ' + item.q;
+
+    const h = document.createElement('div');
+    h.className = 'shint';
+    h.textContent = '💬 ' + item.h;
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'sdone';
+    btn.textContent = '✓ Сказала';
+
+    card.addEventListener('click', () => card.classList.toggle('open'));
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      card.classList.toggle('done');
+      const said = box.querySelectorAll('.scard.done').length;
+      const s = document.getElementById('speakScore');
+      if(said === speakQs.length){
+        s.textContent = 'Ты ответила на все вопросы! Amazing 🌟';
+        s.classList.add('win');
+      } else {
+        s.textContent = 'Отвечено: ' + said + ' / ' + speakQs.length;
+        s.classList.remove('win');
+      }
+    });
+
+    card.append(q, h, btn);
+    box.appendChild(card);
+  });
+
+  document.getElementById('speakScore').textContent = 'Отвечено: 0 / ' + speakQs.length;
+
+  let currentQ = '';
+  const rndQ = document.getElementById('rndQ');
+  const rndSpeak = document.getElementById('rndSpeak');
+
+  document.getElementById('rndBtn').addEventListener('click', () => {
+    const pick = speakQs[Math.floor(Math.random() * speakQs.length)];
+    currentQ = pick.q;
+    rndQ.textContent = currentQ;
+    rndSpeak.style.display = 'inline-block';
+    speak(currentQ);
+  });
+
+  rndSpeak.addEventListener('click', () => { if(currentQ) speak(currentQ); });
+})();
+
+/* ================== 8. writing ================== */
+(function buildWriting(){
+  const area = document.getElementById('wrArea');
+  const factsBox = document.getElementById('wrFacts');
+  const msg = document.getElementById('wrMsg');
+  const model = document.getElementById('wrModel');
+
+  const checks = {
+    is:      t => /\bis\b/i.test(t),
+    age:     t => /63/.test(t),
+    job:     t => /actor/i.test(t),
+    nat:     t => /american/i.test(t),
+    country: t => /(the\s+u\.?s\.?a\.?|the\s+us\b|united\s+states|\busa\b)/i.test(t)
+  };
+
+  document.getElementById('wrCheck').addEventListener('click', () => {
+    const t = area.value.trim();
+    if(!t){
+      msg.textContent = 'Сначала напиши свой рассказ 🙂';
+      return;
+    }
+    let ok = 0;
+    Array.from(factsBox.children).forEach(el => {
+      const pass = checks[el.dataset.key](t);
+      el.classList.toggle('ok', pass);
+      if(pass) ok++;
+    });
+    const sentences = (t.match(/[.!?]+/g) || []).length;
+
+    if(ok === 5 && sentences >= 4){
+      msg.textContent = 'Всё на месте! Отличный рассказ 🌟';
+    } else if(ok === 5){
+      msg.textContent = 'Все факты есть — добавь ещё пару предложений (нужно 4–6) ✍️';
+    } else {
+      msg.textContent = 'Есть ' + ok + ' из 5 фактов. Посмотри на подсвеченные подсказки 💡';
+    }
+  });
+
+  document.getElementById('wrModelBtn').addEventListener('click', () => {
+    model.classList.toggle('show');
+  });
+})();
+</script>
+</body>
+</html>
